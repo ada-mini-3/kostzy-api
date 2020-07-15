@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, \
                                         PermissionsMixin
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -42,3 +43,45 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Tag(models.Model):
+    """ tag model """
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Category(models.Model):
+    """ category model """
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Feed(models.Model):
+    """ feed model """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    feed = models.CharField(max_length=255)
+    lat = models.DecimalField(max_digits=10, decimal_places=2)
+    long = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    tags = models.ManyToManyField('Tag')
+    location_lat = models.DecimalField(
+        null=True,
+        max_digits=10,
+        decimal_places=2
+    )
+    location_long = models.DecimalField(
+        null=True,
+        max_digits=10,
+        decimal_places=2
+    )
+
+    def __str__(self):
+        return self.feed
