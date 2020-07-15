@@ -46,3 +46,23 @@ class LoginSerializer(serializers.Serializer):
             )
         attrs['user'] = user
         return attrs
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    """ User Profile Serializer """
+
+    class Meta:
+        model = get_user_model()
+        fields = ('name', 'email', 'exp', 'about', 'age', 'password')
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
+
+    def update(self, instance, validated_data):
+        """ update user """
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+
+        return user

@@ -8,6 +8,7 @@ from rest_framework import status
 
 URL_REGISTER = reverse('userauth:register')
 URL_LOGIN = reverse('userauth:login')
+URL_PROFILE = reverse('userauth:profile')
 
 
 def create_user(**params):
@@ -82,3 +83,52 @@ class AuthApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertNotIn('token', res.data)
+
+    def test_user_cant_access_profile_without_login(self):
+        """ test user cannot access profile without
+            token credentials """
+        res = self.client.get(URL_PROFILE)
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class ProfileApiTest(TestCase):
+    """ test user profile api """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user(
+            email='raisazka@gmail.com',
+            name='Rais',
+            password='testing123'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_user_profile_success(self):
+        """ test return user profile is successful """
+        res = self.client.get(URL_PROFILE)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('name', res.data)
+
+    def test_update_user_profile_success(self):
+        """ test update user profile is success """
+        payload = {
+            'name': 'New Name',
+            'password': 'New Pass',
+            'about': 'New About'
+        }
+
+        res = self.client.patch(URL_PROFILE, payload)
+
+        self.user.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user.name, payload['name'])
+        self.assertEqual(self.user.about, payload['about'])
+        self.assertTrue(self.user.check_password(payload['password']))
+
+    def test_profile_post_method_not_allowed(self):
+        """ test that post method not allowed in profile url """
+        res = self.client.post(URL_PROFILE, {})
+
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
