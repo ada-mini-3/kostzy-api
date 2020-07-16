@@ -10,7 +10,7 @@ class UserAdmin(BaseAdmin):
     ordering = ['id']
     list_display = ['id', 'email', 'name', 'about', 'age', 'exp']
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('name', 'email', 'password')}),
         (_('User Info'), {'fields': ('about', 'age', 'exp')}),
         (
             _('Permissions'),
@@ -29,3 +29,6 @@ class UserAdmin(BaseAdmin):
 
 
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Tag)
+admin.site.register(models.Category)
+admin.site.register(models.Feed)

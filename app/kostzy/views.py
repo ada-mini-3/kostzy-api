@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from kostzy.serializers import FeedSerializer
+from kostzy.serializers import FeedSerializer, FeedCreateSerializer
 from core.models import Feed
 
 
@@ -33,3 +33,10 @@ class FeedsViewSet(viewsets.GenericViewSet,
     def perform_create(self, serializer):
         """ save the feed with user id """
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        """ return appropriate serializer class """
+        if self.action == 'list':
+            return FeedSerializer
+        elif self.action == 'create':
+            return FeedCreateSerializer

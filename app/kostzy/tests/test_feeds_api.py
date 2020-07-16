@@ -116,3 +116,56 @@ class PublicFeedApiTest(TestCase):
         res = self.client.post(URL_FEEDS, {})
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateFeedsApiTest(TestCase):
+    """ private feeds api test """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email='raisazka@gmail.com',
+            password='testing123'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_feeds_is_successful(self):
+        """ test that create feeds is successful """
+        category = create_category()
+        payload = {
+            'feed': 'New Feeds',
+            'category': category.id,
+            'lat': 7,
+            'long': 10
+        }
+
+        res = self.client.post(URL_FEEDS, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_create_feeds_with_tags(self):
+        """ test create feed with tags is successful """
+        category = create_category()
+        tag1 = create_tags()
+        tag2 = create_tags(name='Happy')
+        payload = {
+            'feed': 'New Feeds',
+            'category': category.id,
+            'lat': 7,
+            'long': 10,
+            'tags': [tag1.id, tag2.id]
+        }
+
+        res = self.client.post(URL_FEEDS, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        feed = Feed.objects.get(id=res.data['id'])
+        tags = feed.tags.all()
+        self.assertEqual(tags.count(), 2)
+        self.assertIn(tag1, tags)
+        self.assertIn(tag2, tags)
+
+    def test_create_feeds_with_invalid_credentials(self):
+        """ test create feed invalid credentials failed """
+        res = self.client.post(URL_FEEDS, {})
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

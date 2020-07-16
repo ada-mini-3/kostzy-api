@@ -40,3 +40,11 @@ class FeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'feed', 'lat', 'long', 'tags',
                   'category', 'location_lat', 'location_long')
         read_only_fields = ('id',)
+
+
+class FeedCreateSerializer(FeedSerializer):
+    """ seralizer for creating feed """
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all()
+    )
