@@ -5,12 +5,18 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from core.models import Tag, Category, Feed
+from core.models import Tag, Category, Feed, Like
 
-from kostzy.serializers import FeedSerializer
+from kostzy.serializers import FeedSerializer, LikeSerializer
 
 
 URL_FEEDS = reverse('kostzy:feed-list')
+URL_LIKES = reverse('kostzy:like-list')
+
+
+def detail_like_url(like_id):
+    """ return like detail url """
+    return reverse('kostzy:like-detail', args=[like_id])
 
 
 def create_tags(name='Happy'):
@@ -169,3 +175,44 @@ class PrivateFeedsApiTest(TestCase):
         """ test create feed invalid credentials failed """
         res = self.client.post(URL_FEEDS, {})
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_feeds_like(self):
+        """ test create like in feeds"""
+        category = create_category()
+        feeds = create_feeds(user=self.user, category=category)
+
+        payload = {'feed': feeds.id}
+
+        res = self.client.post(URL_LIKES, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_feeds_unlike(self):
+        """ test unlike feeds """
+        category = create_category()
+        feeds = create_feeds(user=self.user, category=category)
+        like = Like.objects.create(user=self.user, feed=feeds)
+        url = detail_like_url(like.id)
+        res = self.client.delete(url)
+
+        likes = Like.objects.all()
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(likes.count(), 0)
+
+    def test_get_likes(self):
+        """ test get likes """
+        category = create_category()
+        feeds = create_feeds(user=self.user, category=category, feed='Hello')
+        feeds = create_feeds(user=self.user, category=category)
+        Like.objects.create(user=self.user, feed=feeds)
+        Like.objects.create(user=self.user, feed=feeds)
+
+        likes = Like.objects.all()
+        serializer = LikeSerializer(likes, many=True)
+
+        res = self.client.get(URL_LIKES)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 2)
+        self.assertEqual(res.data, serializer.data)

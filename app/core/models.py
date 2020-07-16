@@ -82,6 +82,20 @@ class Feed(models.Model):
         max_digits=10,
         decimal_places=2
     )
+    location_name = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.feed
+
+
+class Like(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.feed.feed

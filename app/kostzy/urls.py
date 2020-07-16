@@ -6,6 +6,7 @@ from kostzy import views
 
 router = DefaultRouter()
 router.register('feeds', views.FeedsViewSet)
+router.register('likes', views.LikeViewSet)
 
 app_name = 'kostzy'
 

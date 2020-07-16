@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from core.models import Tag, Category, Feed
+from core.models import Tag, Category, Feed, Like
 
 
 class ModelTests(TestCase):
@@ -65,3 +65,24 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(feeds), feeds.feed)
+
+    def test_like_model(self):
+        """ test like model """
+        user = get_user_model().objects.create_user(
+            email='raisazka@gmail.com',
+            password='password123'
+        )
+        category = Category.objects.create(
+            name='Foods'
+        )
+        feeds = Feed.objects.create(
+            user=user,
+            category=category,
+            feed='Hello',
+            lat=10,
+            long=16
+        )
+
+        like = Like.objects.create(user=user, feed=feeds)
+
+        self.assertEqual(str(like), like.feed.feed)
