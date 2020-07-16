@@ -89,7 +89,7 @@ class Feed(models.Model):
 
 
 class Like(models.Model):
-
+    """ like model """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
@@ -99,3 +99,17 @@ class Like(models.Model):
 
     def __str__(self):
         return self.feed.feed
+
+
+class Comment(models.Model):
+    """ comment model """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=255)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.comment

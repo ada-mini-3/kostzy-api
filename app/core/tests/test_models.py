@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from core.models import Tag, Category, Feed, Like
+from core.models import Tag, Category, Feed, Like, Comment
 
 
 class ModelTests(TestCase):
@@ -86,3 +86,28 @@ class ModelTests(TestCase):
         like = Like.objects.create(user=user, feed=feeds)
 
         self.assertEqual(str(like), like.feed.feed)
+
+    def test_comments_model(self):
+        """ test comment model """
+        user = get_user_model().objects.create_user(
+            email='raisazka@gmail.com',
+            password='password123'
+        )
+        category = Category.objects.create(
+            name='Foods'
+        )
+        feeds = Feed.objects.create(
+            user=user,
+            category=category,
+            feed='Hello',
+            lat=10,
+            long=16
+        )
+
+        comments = Comment.objects.create(
+            user=user,
+            feed=feeds,
+            comment='The New Comment',
+        )
+
+        self.assertEqual(str(comments), comments.comment)

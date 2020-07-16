@@ -80,15 +80,15 @@ class PublicFeedApiTest(TestCase):
         )
 
         res = self.client.get(URL_FEEDS, {
-            'category': f'{category1.id}'
+            'category': f'{category2.id}'
         })
 
         serializer1 = FeedSerializer(feeds1)
         serializer2 = FeedSerializer(feeds2)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(serializer1.data, res.data)
-        self.assertNotIn(serializer2.data, res.data)
+        self.assertNotIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
 
     def test_retrieve_list_of_feeds_filtered_tags(self):
         """ test retrieve filtered feeds by tags """

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from core.models import Tag, Category, Feed, User, Like
+from core.models import Tag, Category, Feed, User, Like, \
+                        Comment
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -53,7 +54,17 @@ class FeedCreateSerializer(FeedSerializer):
 
 class LikeSerializer(serializers.ModelSerializer):
     """ serializer for like object """
+
     class Meta:
         model = Like
         fields = ('id', 'user', 'feed', 'date',)
+        read_only_fields = ('id', 'user',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """comment class serializer """
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'user', 'feed', 'comment', 'date',)
         read_only_fields = ('id', 'user',)
