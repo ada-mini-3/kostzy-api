@@ -139,3 +139,16 @@ class CommunityMember(models.Model):
 
     def __str__(self):
         return self.community.name
+
+
+class CommunityDiscussion(models.Model):
+    """ community discussion model """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.text

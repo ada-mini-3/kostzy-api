@@ -43,6 +43,7 @@ def create_feeds(user, **params):
 class PublicFeedApiTest(TestCase):
     """ test public feed api """
     def setUp(self):
+        print(URL_LIKES)
         self.client = APIClient()
         self.sample_user = get_user_model().objects.create_user(
             email='test123@gmail.com',

@@ -9,9 +9,10 @@ router.register('feeds', views.FeedsViewSet)
 router.register('likes', views.LikeViewSet)
 router.register('comments', views.CommentViewSet)
 router.register('community', views.CommunityViewSet)
+router.register('discussion', views.DiscussionViewSet)
 
 app_name = 'kostzy'
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
 ]

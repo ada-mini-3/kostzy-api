@@ -1,8 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from core.models import Tag, Category, Feed, Like, \
-                        Comment, Community, CommunityMember
+from core import models
 
 
 class ModelTests(TestCase):
@@ -34,7 +33,7 @@ class ModelTests(TestCase):
 
     def test_tag_model(self):
         """ test tag models return name """
-        tag = Tag.objects.create(
+        tag = models.Tag.objects.create(
             name='Happy'
         )
 
@@ -42,7 +41,7 @@ class ModelTests(TestCase):
 
     def test_category_model(self):
         """ test category model return name """
-        category = Category.objects.create(
+        category = models.Category.objects.create(
             name='Foods'
         )
 
@@ -54,10 +53,10 @@ class ModelTests(TestCase):
             email='raisazka@gmail.com',
             password='password123'
         )
-        category = Category.objects.create(
+        category = models.Category.objects.create(
             name='Foods'
         )
-        feeds = Feed.objects.create(
+        feeds = models.Feed.objects.create(
             user=user,
             category=category,
             feed='Hello',
@@ -73,10 +72,10 @@ class ModelTests(TestCase):
             email='raisazka@gmail.com',
             password='password123'
         )
-        category = Category.objects.create(
+        category = models.Category.objects.create(
             name='Foods'
         )
-        feeds = Feed.objects.create(
+        feeds = models.Feed.objects.create(
             user=user,
             category=category,
             feed='Hello',
@@ -84,7 +83,7 @@ class ModelTests(TestCase):
             long=16
         )
 
-        like = Like.objects.create(user=user, feed=feeds)
+        like = models.Like.objects.create(user=user, feed=feeds)
 
         self.assertEqual(str(like), like.feed.feed)
 
@@ -94,10 +93,10 @@ class ModelTests(TestCase):
             email='raisazka@gmail.com',
             password='password123'
         )
-        category = Category.objects.create(
+        category = models.Category.objects.create(
             name='Foods'
         )
-        feeds = Feed.objects.create(
+        feeds = models.Feed.objects.create(
             user=user,
             category=category,
             feed='Hello',
@@ -105,7 +104,7 @@ class ModelTests(TestCase):
             long=16
         )
 
-        comments = Comment.objects.create(
+        comments = models.Comment.objects.create(
             user=user,
             feed=feeds,
             comment='The New Comment',
@@ -115,7 +114,7 @@ class ModelTests(TestCase):
 
     def test_community_model(self):
         """ test community model return name """
-        community = Community.objects.create(
+        community = models.Community.objects.create(
             name='Sample Kost',
             lat=10,
             long=5,
@@ -132,7 +131,7 @@ class ModelTests(TestCase):
             email='raisazka@gmail.com',
             password='password123'
         )
-        community = Community.objects.create(
+        community = models.Community.objects.create(
             name='Sample Kost',
             lat=10,
             long=5,
@@ -140,9 +139,32 @@ class ModelTests(TestCase):
             subtitle='Subtitle',
             location='Binus'
         )
-        comm_member = CommunityMember.objects.create(
+        comm_member = models.CommunityMember.objects.create(
             user=user,
             community=community
         )
 
         self.assertEqual(str(comm_member), community.name)
+
+    def test_community_discussion(self):
+        """ test community discussion model """
+        user = get_user_model().objects.create_user(
+            email='raisazka@gmail.com',
+            password='password123'
+        )
+        community = models.Community.objects.create(
+            name='Sample Kost',
+            lat=10,
+            long=5,
+            description='Kost area binus',
+            subtitle='Subtitle',
+            location='Binus'
+        )
+
+        discussion = models.CommunityDiscussion.objects.create(
+            user=user,
+            community=community,
+            text='New Discussion'
+        )
+
+        self.assertEqual(str(discussion), discussion.text)
