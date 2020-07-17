@@ -1,15 +1,17 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from kostzy import serializers
-from core.models import Feed, Like, Comment
+from core.models import Feed, Like, Comment, Community
 
 
 class FeedsViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.CreateModelMixin,
-                   mixins.RetrieveModelMixin,):
+                   mixins.RetrieveModelMixin):
 
     serializer_class = serializers.FeedSerializer
     authentication_classes = (TokenAuthentication,)
@@ -80,3 +82,46 @@ class CommentViewSet(viewsets.GenericViewSet,
     def perform_create(self, serializer):
         """ save with user id """
         serializer.save(user=self.request.user)
+
+
+class CommunityViewSet(viewsets.GenericViewSet,
+                       mixins.ListModelMixin,
+                       mixins.RetrieveModelMixin):
+
+    serializer_class = serializers.CommunityListSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Community.objects.all()
+
+    def get_serializer_class(self):
+        """ return appropriate serializer class """
+        if self.action == 'list':
+            return serializers.CommunityListSerializer
+        elif self.action == 'retrieve':
+            return serializers.CommunityRetrieveSerializer
+        elif self.action == 'member_request':
+            return serializers.CommunityMemberSerializer
+
+    def perform_create(self, serializer):
+        """ save with user id """
+        serializer.save(user=self.request.user)
+
+    @action(methods=['POST'], detail=True, url_path='member-request')
+    def member_request(self, request, pk=None):
+        """ member request join action """
+        community = self.get_object()
+        serializer = self.get_serializer(
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save(user=self.request.user, community=community)
+            return Response(
+                serializer.data,
+                status.HTTP_201_CREATED
+            )
+
+        return Response(
+                serializer.errors,
+                status.HTTP_400_BAD_REQUEST
+            )

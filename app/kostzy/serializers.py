@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.models import Tag, Category, Feed, User, Like, \
-                        Comment
+                        Comment, Community, CommunityMember
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -64,7 +64,39 @@ class LikeSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     """comment class serializer """
 
+    user = UserFeedSerializer(read_only=True)
+
     class Meta:
         model = Comment
         fields = ('id', 'user', 'feed', 'comment', 'date',)
         read_only_fields = ('id', 'user',)
+
+
+class CommunityListSerializer(serializers.ModelSerializer):
+    """ serializer for list community """
+
+    class Meta:
+        model = Community
+        fields = ('id', 'name', 'subtitle', 'lat', 'long',)
+        read_only_fields = ('id', 'name', 'subtitle', 'lat', 'long')
+
+
+class CommunityRetrieveSerializer(serializers.ModelSerializer):
+    """ serializer for retrieve community """
+
+    class Meta:
+        model = Community
+        fields = ('id', 'name', 'description', 'lat', 'long', 'location',)
+        read_only_fields = ('id', 'name', 'subtitle', 'lat',
+                            'long', 'location')
+
+
+class CommunityMemberSerializer(serializers.ModelSerializer):
+    """ serializer for community member request join """
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    community = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = CommunityMember
+        fields = ('id', 'user', 'community', 'is_joined',)
+        read_only_fields = ('id',)

@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from core.models import Tag, Category, Feed, Like, Comment
+from core.models import Tag, Category, Feed, Like, \
+                        Comment, Community, CommunityMember
 
 
 class ModelTests(TestCase):
@@ -111,3 +112,37 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(comments), comments.comment)
+
+    def test_community_model(self):
+        """ test community model return name """
+        community = Community.objects.create(
+            name='Sample Kost',
+            lat=10,
+            long=5,
+            description='Kost area binus',
+            subtitle='Subtitle',
+            location='Binus'
+        )
+
+        self.assertEqual(str(community), community.name)
+
+    def test_community_member_model(self):
+        """ test community member model """
+        user = get_user_model().objects.create_user(
+            email='raisazka@gmail.com',
+            password='password123'
+        )
+        community = Community.objects.create(
+            name='Sample Kost',
+            lat=10,
+            long=5,
+            description='Kost area binus',
+            subtitle='Subtitle',
+            location='Binus'
+        )
+        comm_member = CommunityMember.objects.create(
+            user=user,
+            community=community
+        )
+
+        self.assertEqual(str(comm_member), community.name)

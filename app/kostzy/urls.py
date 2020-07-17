@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register('feeds', views.FeedsViewSet)
 router.register('likes', views.LikeViewSet)
 router.register('comments', views.CommentViewSet)
+router.register('community', views.CommunityViewSet)
 
 app_name = 'kostzy'
 

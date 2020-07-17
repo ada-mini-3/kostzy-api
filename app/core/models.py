@@ -113,3 +113,29 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment
+
+
+class Community(models.Model):
+    """ community model """
+    name = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    lat = models.DecimalField(max_digits=10, decimal_places=2)
+    long = models.DecimalField(max_digits=10, decimal_places=2)
+    location = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class CommunityMember(models.Model):
+    """ community member model """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    is_joined = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.community.name
