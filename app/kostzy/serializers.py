@@ -34,13 +34,36 @@ class FeedSerializer(serializers.ModelSerializer):
     """ serializer for feed object """
     tags = TagSerializer(many=True, read_only=True)
     user = UserFeedSerializer(read_only=True)
+    like_status = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Feed
         fields = ('id', 'user', 'feed', 'lat', 'long', 'tags',
                   'category', 'location_lat', 'location_long',
-                  'location_name')
-        read_only_fields = ('id',)
+                  'location_name', 'like_status', 'like_count',
+                  'comment_count')
+        read_only_fields = ('id', 'like_status', 'like_count',
+                            'comment_count')
+
+    def get_comment_count(self, feed):
+        """ get comment count """
+        return models.Comment.objects.filter(feed=feed).count()
+
+    def get_like_count(self, feed):
+        """ get like count """
+        return models.Like.objects.filter(feed=feed).count()
+
+    def get_like_status(self, feed):
+        """ get the like status for feed """
+        if self.context['request'].user.is_authenticated:
+            the_user = self.context['request'].user
+            likes = models.Like.objects.filter(user=the_user, feed=feed)
+            if likes:
+                return True
+
+        return False
 
 
 class FeedCreateSerializer(FeedSerializer):
@@ -103,8 +126,51 @@ class CommunityMemberSerializer(serializers.ModelSerializer):
 
 class DiscussionSerializer(serializers.ModelSerializer):
     """ serializer for community discussion """
+    user = UserFeedSerializer(read_only=True)
+    like_status = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.CommunityDiscussion
-        fields = ('id', 'user', 'community', 'text')
+        fields = ('id', 'user', 'community', 'text', 'date',
+                  'like_status', 'like_count', 'comment_count')
+        read_only_fields = ('id', 'user')
+
+    def get_comment_count(self, disc):
+        """ get comment count """
+        return models.DiscussionComment.objects.filter(discussion=disc).count()
+
+    def get_like_count(self, disc):
+        """ get like count """
+        return models.DiscussionLike.objects.filter(discussion=disc).count()
+
+    def get_like_status(self, disc):
+        """ get the like status for feed """
+        the_user = self.context['request'].user
+        likes = models.DiscussionLike.objects.filter(
+            user=the_user,
+            discussion=disc
+        )
+        if likes:
+            return True
+
+        return False
+
+
+class DiscussionCommentSerializer(serializers.ModelSerializer):
+    """ serializer for discussion  comment """
+
+    class Meta:
+        model = models.DiscussionComment
+        fields = ('id', 'user', 'discussion', 'comment', 'date')
+        read_only_fields = ('id', 'user')
+
+
+class DiscussionLikeSerializer(serializers.ModelSerializer):
+    """ serializer for discussion like """
+
+    class Meta:
+        model = models.DiscussionLike
+        fields = ('id', 'user', 'discussion')
         read_only_fields = ('id', 'user')

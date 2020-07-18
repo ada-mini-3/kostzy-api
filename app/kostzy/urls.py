@@ -10,6 +10,8 @@ router.register('likes', views.LikeViewSet)
 router.register('comments', views.CommentViewSet)
 router.register('community', views.CommunityViewSet)
 router.register('discussion', views.DiscussionViewSet)
+router.register('discussion-comment', views.DiscussionCommentViewSet)
+router.register('discussion-like', views.DiscussionLikeViewSet)
 
 app_name = 'kostzy'
 

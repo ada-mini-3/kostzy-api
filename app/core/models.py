@@ -83,6 +83,7 @@ class Feed(models.Model):
         decimal_places=2
     )
     location_name = models.CharField(max_length=255, blank=True)
+    date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.feed
@@ -149,6 +150,38 @@ class CommunityDiscussion(models.Model):
     )
     community = models.ForeignKey(Community, on_delete=models.CASCADE)
     text = models.CharField(max_length=255)
+    date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.text
+
+
+class DiscussionComment(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    discussion = models.ForeignKey(
+        CommunityDiscussion,
+        on_delete=models.CASCADE
+    )
+    comment = models.CharField(max_length=255)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.comment
+
+
+class DiscussionLike(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    discussion = models.ForeignKey(
+        CommunityDiscussion,
+        on_delete=models.CASCADE
+    )
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.name

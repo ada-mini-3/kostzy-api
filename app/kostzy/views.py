@@ -144,3 +144,37 @@ class DiscussionViewSet(viewsets.GenericViewSet,
     def perform_create(self, serializer):
         """ save with user id """
         return serializer.save(user=self.request.user)
+
+
+class DiscussionCommentViewSet(viewsets.GenericViewSet,
+                               mixins.ListModelMixin,
+                               mixins.CreateModelMixin):
+
+    serializer_class = serializers.DiscussionCommentSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = models.DiscussionComment.objects.all()
+
+    def get_queryset(self):
+        """ return only by discussion id """
+        discussion_id = self.request.query_params.get('discussion')
+        return self.queryset.filter(discussion__id=discussion_id)
+
+    def perform_create(self, serializer):
+        """ create new discussion comment with user id """
+        serializer.save(user=self.request.user)
+
+
+class DiscussionLikeViewSet(viewsets.GenericViewSet,
+                            mixins.ListModelMixin,
+                            mixins.CreateModelMixin,
+                            mixins.DestroyModelMixin):
+
+    serializer_class = serializers.DiscussionCommentSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = models.DiscussionLike.objects.all()
+
+    def perform_create(self, serializer):
+        """ create new discussion with user id """
+        serializer.save(user=self.request.user)
