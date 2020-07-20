@@ -53,7 +53,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'exp', 'about', 'age', 'password')
+        fields = ('name', 'email', 'exp', 'about', 'age', 'password', 'image')
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
 
     def update(self, instance, validated_data):

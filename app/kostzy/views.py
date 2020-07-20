@@ -3,6 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import parsers
 
 from kostzy import serializers
 from core import models
@@ -15,6 +16,11 @@ class FeedsViewSet(viewsets.GenericViewSet,
 
     serializer_class = serializers.FeedSerializer
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    )
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = models.Feed.objects.all()
 
@@ -133,8 +139,20 @@ class DiscussionViewSet(viewsets.GenericViewSet,
 
     serializer_class = serializers.DiscussionSerializer
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    )
     permission_classes = (permissions.IsAuthenticated,)
     queryset = models.CommunityDiscussion.objects.all()
+
+    def get_serializer_class(self):
+        """ return appropriate serializer class """
+        if self.action == 'create':
+            return serializers.DiscussionCreateSerializer
+        else:
+            return serializers.DiscussionSerializer
 
     def get_queryset(self):
         """ return data based on community only """

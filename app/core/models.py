@@ -1,7 +1,18 @@
+import uuid
+import os
+
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, \
                                         PermissionsMixin
 from django.conf import settings
+
+
+def image_path(instance, filename):
+    """ generate filepath for images """
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('uploads/images/', filename)
 
 
 class UserManager(BaseUserManager):
@@ -37,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     exp = models.IntegerField(default=0)
     about = models.CharField(max_length=255, blank=True)
     age = models.IntegerField(null=True)
+    image = models.ImageField(null=True, upload_to=image_path)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
@@ -89,6 +101,16 @@ class Feed(models.Model):
         return self.feed
 
 
+class FeedImage(models.Model):
+    """ feed image """
+    feed = models.ForeignKey(
+        Feed,
+        related_name='image_feed',
+        on_delete=models.CASCADE
+    )
+    image = models.ImageField(null=True, upload_to=image_path)
+
+
 class Like(models.Model):
     """ like model """
     user = models.ForeignKey(
@@ -124,6 +146,7 @@ class Community(models.Model):
     lat = models.DecimalField(max_digits=10, decimal_places=2)
     long = models.DecimalField(max_digits=10, decimal_places=2)
     location = models.CharField(max_length=255)
+    image = models.ImageField(null=True, upload_to=image_path)
 
     def __str__(self):
         return self.name
@@ -154,6 +177,16 @@ class CommunityDiscussion(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class DiscussionImage(models.Model):
+    """ discussion image """
+    discussion = models.ForeignKey(
+        CommunityDiscussion,
+        related_name='discussion_image',
+        on_delete=models.CASCADE
+    )
+    image = models.ImageField(null=True, upload_to=image_path)
 
 
 class DiscussionComment(models.Model):

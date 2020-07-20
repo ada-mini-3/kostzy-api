@@ -30,6 +30,15 @@ class UserFeedSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'name')
 
 
+class FeedImageSerializer(serializers.ModelSerializer):
+    """ serializer feed image """
+
+    class Meta:
+        model = models.FeedImage
+        fields = ('id', 'image')
+        read_only_fields = ('id',)
+
+
 class FeedSerializer(serializers.ModelSerializer):
     """ serializer for feed object """
     tags = TagSerializer(many=True, read_only=True)
@@ -37,13 +46,14 @@ class FeedSerializer(serializers.ModelSerializer):
     like_status = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    image_feed = FeedImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Feed
         fields = ('id', 'user', 'feed', 'lat', 'long', 'tags',
-                  'category', 'location_lat', 'location_long',
-                  'location_name', 'like_status', 'like_count',
-                  'comment_count')
+                  'category', 'image_feed', 'location_lat',
+                  'location_long', 'location_name', 'like_status',
+                  'like_count', 'comment_count')
         read_only_fields = ('id', 'like_status', 'like_count',
                             'comment_count')
 
@@ -72,6 +82,27 @@ class FeedCreateSerializer(FeedSerializer):
         many=True,
         queryset=models.Tag.objects.all()
     )
+    image_feed = serializers.ListSerializer(
+        child=serializers.ImageField(
+            allow_empty_file=False,
+            max_length=100000
+        ),
+        required=False
+    )
+
+    def create(self, validated_data):
+        tags_data = validated_data.pop('tags')
+        images_data = validated_data.pop('image_feed', [])
+        feed = models.Feed.objects.create(**validated_data)
+
+        for tag in tags_data:
+            tags, created = models.Tag.objects.get_or_create(name=tag)
+            feed.tags.add(tag)
+
+        for image in images_data:
+            models.FeedImage.objects.create(feed=feed, image=image)
+
+        return feed
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -124,17 +155,27 @@ class CommunityMemberSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
+class DiscussionImageSerializer(serializers.ModelSerializer):
+    """ discussion image serializer """
+    class Meta:
+        model = models.DiscussionImage
+        fields = ('id', 'image')
+        read_only_fields = ('id',)
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
     """ serializer for community discussion """
     user = UserFeedSerializer(read_only=True)
     like_status = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    discussion_image = DiscussionImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.CommunityDiscussion
         fields = ('id', 'user', 'community', 'text', 'date',
-                  'like_status', 'like_count', 'comment_count')
+                  'discussion_image', 'like_status', 'like_count',
+                  'comment_count')
         read_only_fields = ('id', 'user')
 
     def get_comment_count(self, disc):
@@ -156,6 +197,28 @@ class DiscussionSerializer(serializers.ModelSerializer):
             return True
 
         return False
+
+
+class DiscussionCreateSerializer(DiscussionSerializer):
+    """ discussion create serializer """
+    discussion_image = serializers.ListSerializer(
+        child=serializers.ImageField(
+            allow_empty_file=False,
+            max_length=100000
+        ),
+        required=False
+    )
+
+    def create(self, validated_data):
+        images_data = validated_data.pop('discussion_image', [])
+        diss = models.CommunityDiscussion.objects.create(**validated_data)
+        for image in images_data:
+            models.DiscussionImage.objects.create(
+                discussion=diss,
+                image=image
+            )
+
+        return diss
 
 
 class DiscussionCommentSerializer(serializers.ModelSerializer):
