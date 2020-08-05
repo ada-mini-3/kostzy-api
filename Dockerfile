@@ -20,3 +20,7 @@ RUN adduser -D user
 RUN chown -R user:user /vol/
 RUN chmod -R 755 /vol/web
 USER user
+
+EXPOSE 8000
+
+CMD exec gunicorn app.wsgi:application --bind 0.0.0.0:8000 --workers 3

@@ -26,7 +26,7 @@ class UserFeedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'image')
         read_only_fields = ('id', 'name')
 
 
