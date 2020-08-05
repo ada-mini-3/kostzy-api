@@ -8,7 +8,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Tag
-        fields = ('id', 'name',)
+        fields = ('id', 'name', 'color',)
         read_only_fields = ('id',)
 
 
