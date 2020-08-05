@@ -60,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Tag(models.Model):
     """ tag model """
     name = models.CharField(max_length=255)
+    color = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.name
