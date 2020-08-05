@@ -53,7 +53,7 @@ class FeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'feed', 'lat', 'long', 'tags',
                   'category', 'image_feed', 'location_lat',
                   'location_long', 'location_name', 'like_status',
-                  'like_count', 'comment_count')
+                  'like_count', 'comment_count', 'date')
         read_only_fields = ('id', 'like_status', 'like_count',
                             'comment_count')
 

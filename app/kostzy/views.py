@@ -22,7 +22,7 @@ class FeedsViewSet(viewsets.GenericViewSet,
         parsers.JSONParser,
     )
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    queryset = models.Feed.objects.all()
+    queryset = models.Feed.objects.all().order_by('-date')
 
     def get_queryset(self):
         """ retrieve & filter the feed """
@@ -78,7 +78,7 @@ class CommentViewSet(viewsets.GenericViewSet,
     serializer_class = serializers.CommentSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = models.Comment.objects.all()
+    queryset = models.Comment.objects.all().order_by('-date')
 
     def get_queryset(self):
         """ get comment based on feeds """
@@ -145,7 +145,7 @@ class DiscussionViewSet(viewsets.GenericViewSet,
         parsers.JSONParser,
     )
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = models.CommunityDiscussion.objects.all()
+    queryset = models.CommunityDiscussion.objects.all().order_by('-date')
 
     def get_serializer_class(self):
         """ return appropriate serializer class """
@@ -171,7 +171,7 @@ class DiscussionCommentViewSet(viewsets.GenericViewSet,
     serializer_class = serializers.DiscussionCommentSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = models.DiscussionComment.objects.all()
+    queryset = models.DiscussionComment.objects.all().order_by('-date')
 
     def get_queryset(self):
         """ return only by discussion id """
