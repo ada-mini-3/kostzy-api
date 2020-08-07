@@ -77,7 +77,7 @@ class CommentViewSet(viewsets.GenericViewSet,
 
     serializer_class = serializers.CommentSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = models.Comment.objects.all().order_by('-date')
 
     def get_queryset(self):
@@ -96,7 +96,7 @@ class CommunityViewSet(viewsets.GenericViewSet,
 
     serializer_class = serializers.CommunityListSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = models.Community.objects.all()
 
     def get_serializer_class(self):
@@ -144,7 +144,7 @@ class DiscussionViewSet(viewsets.GenericViewSet,
         parsers.FormParser,
         parsers.JSONParser,
     )
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = models.CommunityDiscussion.objects.all().order_by('-date')
 
     def get_serializer_class(self):
@@ -170,7 +170,7 @@ class DiscussionCommentViewSet(viewsets.GenericViewSet,
 
     serializer_class = serializers.DiscussionCommentSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = models.DiscussionComment.objects.all().order_by('-date')
 
     def get_queryset(self):
