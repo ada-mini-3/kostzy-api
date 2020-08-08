@@ -137,6 +137,9 @@ class CommunityListSerializer(serializers.ModelSerializer):
 
     def get_is_joined(self, community):
         """ get is joined community status """
+        if self.context['request'].user.is_anonymous:
+            return False
+            
         the_user = self.context['request'].user
         joined = models.CommunityMember.objects.filter(
             user=the_user,
