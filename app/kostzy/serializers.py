@@ -130,7 +130,8 @@ class CommunityListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Community
-        fields = ('id', 'name', 'subtitle', 'lat', 'long',)
+        fields = ('id', 'name', 'subtitle', 'lat', 'long',
+                  'description', 'location', 'image',)
         read_only_fields = ('id', 'name', 'subtitle', 'lat', 'long')
 
 
