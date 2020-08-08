@@ -127,12 +127,26 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommunityListSerializer(serializers.ModelSerializer):
     """ serializer for list community """
+    is_joined = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Community
         fields = ('id', 'name', 'subtitle', 'lat', 'long',
-                  'description', 'location', 'image',)
+                  'description', 'location', 'image', 'is_joined',)
         read_only_fields = ('id', 'name', 'subtitle', 'lat', 'long')
+
+    def get_is_joined(self, community):
+        """ get is joined community status """
+        the_user = self.context['request'].user
+        joined = models.CommunityMember.objects.filter(
+            user=the_user,
+            community=community
+        )
+
+        if joined:
+            return True
+        
+        return False
 
 
 class CommunityRetrieveSerializer(serializers.ModelSerializer):
