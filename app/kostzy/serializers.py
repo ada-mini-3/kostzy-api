@@ -140,7 +140,8 @@ class CommunityListSerializer(serializers.ModelSerializer):
         the_user = self.context['request'].user
         joined = models.CommunityMember.objects.filter(
             user=the_user,
-            community=community
+            community=community,
+            is_joined=True
         )
 
         if joined:
