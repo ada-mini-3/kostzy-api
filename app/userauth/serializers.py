@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 
+from core.models import CommunityMember, Community
 
 class RegisterSerializer(serializers.ModelSerializer):
     """ serializer for register class """
@@ -48,13 +49,40 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+class CommunityProfileSerializer(serializers.ModelSerializer):
+    """ community profile serializer """
+
+    class Meta:
+        model = Community
+        fields = ('id', 'name', 'image',)
+        read_only_field = ('id', 'name', 'image',)
+
+
+class CommunityMemberSerializer(serializers.ModelSerializer):
+    """ community profile serializer """
+    community = CommunityProfileSerializer(read_only=True)
+
+    class Meta:
+        model = CommunityMember
+        fields = ('community',)
+        read_only_field = ('community',)
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     """ User Profile Serializer """
+    community = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
-        fields = ('name', 'email', 'exp', 'about', 'age', 'password', 'image')
+        fields = ('name', 'email', 'exp', 'about', 'age',
+                  'password', 'image', 'community',)
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
+
+    def get_community(self, profile):
+        community_member = CommunityMember.objects.filter(user=profile)
+        communities = Community.objects.filter(communitymember__in=community_member)
+        serializer = CommunityProfileSerializer(instance=communities, many=True)
+        return serializer.data
 
     def update(self, instance, validated_data):
         """ update user """
