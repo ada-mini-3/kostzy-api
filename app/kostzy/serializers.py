@@ -242,6 +242,7 @@ class DiscussionCreateSerializer(DiscussionSerializer):
 
 class DiscussionCommentSerializer(serializers.ModelSerializer):
     """ serializer for discussion  comment """
+    user = UserFeedSerializer(read_only=True)
 
     class Meta:
         model = models.DiscussionComment
