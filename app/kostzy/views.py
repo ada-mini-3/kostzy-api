@@ -61,11 +61,6 @@ class LikeViewSet(viewsets.GenericViewSet,
     permission_classes = (permissions.IsAuthenticated,)
     queryset = models.Like.objects.all()
 
-    def get_queryset(self):
-        """ get likes for the authenticated user """
-        feeds = models.Feed.objects.filter(user=self.request.user)
-        return self.queryset.filter(feed__in=feeds)
-
     def perform_create(self, serializer):
         """ save the like with user id """
         serializer.save(user=self.request.user)
