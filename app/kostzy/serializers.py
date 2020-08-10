@@ -229,7 +229,10 @@ class DiscussionSerializer(serializers.ModelSerializer):
     def get_like(self, disc):
         the_user = self.context['request'].user
         likes = models.DiscussionLike.objects.filter(user=the_user, discussion=disc)
+        if likes.count() == 0:
+            return None
         serializer = DiscussionLikeSerializer(instance=likes, many=True)
+        
         obj = serializer.data[0]
         return obj
 
