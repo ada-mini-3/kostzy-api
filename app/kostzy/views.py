@@ -7,7 +7,7 @@ from rest_framework import parsers
 
 from kostzy import serializers
 from core import models
-
+from django.shortcuts import get_object_or_404
 
 class FeedsViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,

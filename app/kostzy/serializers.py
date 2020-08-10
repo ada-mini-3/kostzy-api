@@ -116,7 +116,6 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """comment class serializer """
-
     user = UserFeedSerializer(read_only=True)
 
     class Meta:
@@ -182,6 +181,15 @@ class DiscussionImageSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
+class DiscussionLikeSerializer(serializers.ModelSerializer):
+    """ serializer for discussion like """
+
+    class Meta:
+        model = models.DiscussionLike
+        fields = ('id', 'user', 'discussion')
+        read_only_fields = ('id', 'user')
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
     """ serializer for community discussion """
     user = UserFeedSerializer(read_only=True)
@@ -189,13 +197,14 @@ class DiscussionSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     discussion_image = DiscussionImageSerializer(many=True, read_only=True)
+    like = serializers.SerializerMethodField()
 
     class Meta:
         model = models.CommunityDiscussion
-        fields = ('id', 'user', 'community', 'text', 'date',
+        fields = ('id', 'user', 'community', 'text', 'like', 'date',
                   'discussion_image', 'like_status', 'like_count',
                   'comment_count')
-        read_only_fields = ('id', 'user')
+        read_only_fields = ('id', 'user', 'like')
 
     def get_comment_count(self, disc):
         """ get comment count """
@@ -216,6 +225,13 @@ class DiscussionSerializer(serializers.ModelSerializer):
             return True
 
         return False
+
+    def get_like(self, disc):
+        the_user = self.context['request'].user
+        likes = models.DiscussionLike.objects.filter(user=the_user, discussion=disc)
+        serializer = DiscussionLikeSerializer(instance=likes, many=True)
+        obj = serializer.data[0]
+        return obj
 
 
 class DiscussionCreateSerializer(DiscussionSerializer):
@@ -247,13 +263,4 @@ class DiscussionCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.DiscussionComment
         fields = ('id', 'user', 'discussion', 'comment', 'date')
-        read_only_fields = ('id', 'user')
-
-
-class DiscussionLikeSerializer(serializers.ModelSerializer):
-    """ serializer for discussion like """
-
-    class Meta:
-        model = models.DiscussionLike
-        fields = ('id', 'user', 'discussion')
         read_only_fields = ('id', 'user')
