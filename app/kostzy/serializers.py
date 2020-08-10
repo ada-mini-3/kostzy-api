@@ -39,6 +39,15 @@ class FeedImageSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
 
+class LikeSerializer(serializers.ModelSerializer):
+    """ serializer for like object """
+
+    class Meta:
+        model = models.Like
+        fields = ('id', 'user', 'feed', 'date',)
+        read_only_fields = ('id', 'user',)
+
+
 class FeedSerializer(serializers.ModelSerializer):
     """ serializer for feed object """
     tags = TagSerializer(many=True, read_only=True)
@@ -47,10 +56,11 @@ class FeedSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     image_feed = FeedImageSerializer(many=True, read_only=True)
+    like = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Feed
-        fields = ('id', 'user', 'feed', 'lat', 'long', 'tags',
+        fields = ('id', 'user', 'feed', 'lat', 'long', 'tags', 'like',
                   'category', 'image_feed', 'location_lat',
                   'location_long', 'location_name', 'like_status',
                   'like_count', 'comment_count', 'date')
@@ -74,6 +84,19 @@ class FeedSerializer(serializers.ModelSerializer):
                 return True
 
         return False
+    
+    def get_like(self, feed):
+        if self.context['request'].user.is_authenticated:
+            the_user = self.context['request'].user
+            likes = models.Like.objects.filter(user=the_user, feed=feed)
+            if likes.count() == 0:
+                return None
+            serializer = LikeSerializer(instance=likes, many=True)
+        
+            obj = serializer.data[0]
+            return obj
+        
+        return None
 
 
 class FeedCreateSerializer(FeedSerializer):
@@ -103,15 +126,6 @@ class FeedCreateSerializer(FeedSerializer):
             models.FeedImage.objects.create(feed=feed, image=image)
 
         return feed
-
-
-class LikeSerializer(serializers.ModelSerializer):
-    """ serializer for like object """
-
-    class Meta:
-        model = models.Like
-        fields = ('id', 'user', 'feed', 'date',)
-        read_only_fields = ('id', 'user',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
