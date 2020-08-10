@@ -188,7 +188,7 @@ class DiscussionLikeViewSet(viewsets.GenericViewSet,
                             mixins.CreateModelMixin,
                             mixins.DestroyModelMixin):
 
-    serializer_class = serializers.DiscussionCommentSerializer
+    serializer_class = serializers.DiscussionLikeSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     queryset = models.DiscussionLike.objects.all()
