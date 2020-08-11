@@ -13,7 +13,7 @@ class TagViewSet(viewsets.GenericViewSet,
                  mixins.ListModelMixin):
     
     serializer_class = serializers.TagSerializer
-    queryset = models.Tag.objects.all()
+    queryset = models.Tag.objects.all().order_by('-id')
 
 
 class FeedsViewSet(viewsets.GenericViewSet,
@@ -99,7 +99,7 @@ class CommunityViewSet(viewsets.GenericViewSet,
     serializer_class = serializers.CommunityListSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    queryset = models.Community.objects.all()
+    queryset = models.Community.objects.all().order_by('-id')
 
     def get_serializer_class(self):
         """ return appropriate serializer class """
