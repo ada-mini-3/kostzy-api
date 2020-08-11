@@ -117,9 +117,8 @@ class FeedCreateSerializer(FeedSerializer):
         tags_data = validated_data.pop('tags')
         images_data = validated_data.pop('image_feed', [])
         feed = models.Feed.objects.create(**validated_data)
-
         for tag in tags_data:
-            tags, created = models.Tag.objects.get_or_create(name=tag)
+            the_tag = models.Tag.objects.get_or_create(id=tag.id)
             feed.tags.add(tag)
 
         for image in images_data:
