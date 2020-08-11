@@ -9,6 +9,13 @@ from kostzy import serializers
 from core import models
 from django.shortcuts import get_object_or_404
 
+class TagViewSet(viewsets.GenericViewSet,
+                 mixins.ListModelMixin):
+    
+    serializer_class = serializers.TagSerializer
+    queryset = models.Tag.objects.all()
+
+
 class FeedsViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
                    mixins.CreateModelMixin,

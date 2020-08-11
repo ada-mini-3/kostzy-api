@@ -5,6 +5,7 @@ from kostzy import views
 
 
 router = DefaultRouter()
+router.register('tags', views.TagViewSet)
 router.register('feeds', views.FeedsViewSet)
 router.register('likes', views.LikeViewSet)
 router.register('comments', views.CommentViewSet)
